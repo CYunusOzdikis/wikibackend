@@ -2,6 +2,7 @@ from flask import Flask, Response
 from flask_cors import CORS
 import datetime
 import json
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -17,4 +18,5 @@ def get_daily_article():
     return Response(json.dumps(data, ensure_ascii=False), mimetype='application/json')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
