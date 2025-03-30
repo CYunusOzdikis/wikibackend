@@ -7,6 +7,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+wikipedia.set_lang("tr")
+
 @app.route("/random", methods=["GET"])
 def get_random_article():
     try:
