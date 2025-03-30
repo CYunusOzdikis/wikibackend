@@ -1,12 +1,14 @@
 from flask import Flask, Response
 from flask_cors import CORS
 import wikipediaapi
+import random
 import json
 import os
 
 app = Flask(__name__)
 CORS(app)
 
+# Wikipedia Türkçe ayarı
 wiki_tr = wikipediaapi.Wikipedia(
     language='tr',
     user_agent='WikibulyaApp/1.0 (cyunusozdikis@gmail.com)'
@@ -15,24 +17,32 @@ wiki_tr = wikipediaapi.Wikipedia(
 @app.route("/daily", methods=["GET"])
 def get_random_article():
     try:
-        page = wiki_tr.random(pages=1)
-        title = page.title
-        summary = page.summary
+        # Türkçe Wikipedia’daki popüler rastgele sayfalardan biri
+        random_titles = [
+            "Türkiye", "Matematik", "Fizik", "Tarih", "İstanbul",
+            "Sanat", "Felsefe", "Biyoloji", "Bilgisayar", "Müzik"
+        ]
+        title = random.choice(random_titles)
+        page = wiki_tr.page(title)
+
+        if not page.exists():
+            raise Exception("Makale bulunamadı.")
 
         data = {
-            "title": title,
-            "content": summary
+            "title": page.title,
+            "content": page.summary
         }
 
         return Response(
             json.dumps(data, ensure_ascii=False),
-            content_type='application/json; charset=utf-8'
+            content_type="application/json; charset=utf-8"
         )
+
     except Exception as e:
         return Response(
             json.dumps({"error": str(e)}, ensure_ascii=False),
             status=500,
-            content_type='application/json; charset=utf-8'
+            content_type="application/json; charset=utf-8"
         )
 
 if __name__ == "__main__":
