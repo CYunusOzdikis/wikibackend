@@ -1,21 +1,24 @@
 from flask import Flask, Response
 from flask_cors import CORS
-import datetime
+import wikipedia
 import json
 import os
 
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/daily", methods=["GET"])
-def get_daily_article():
-    today = datetime.date.today().isoformat()
-    data = {
-        "date": today,
-        "title": "Türkiye",
-        "content": "Türkiye, Asya ve Avrupa kıtaları arasında yer alan bir ülkedir. Başkenti Ankara'dır."
-    }
-    return Response(json.dumps(data, ensure_ascii=False), mimetype='application/json')
+@app.route("/random", methods=["GET"])
+def get_random_article():
+    try:
+        page = wikipedia.random()
+        summary = wikipedia.summary(page, sentences=5)
+        data = {
+            "title": page,
+            "content": summary
+        }
+        return Response(json.dumps(data, ensure_ascii=False), mimetype='application/json')
+    except Exception as e:
+        return Response(json.dumps({"error": str(e)}), status=500, mimetype='application/json')
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
