@@ -28,6 +28,8 @@ def get_random_article():
         if not page.exists():
             raise Exception("Makale bulunamadı.")
 
+        print("📄 Seçilen makale:", title)  # ← TERMINALE LOG EKLENDİ
+
         data = {
             "title": page.title,
             "content": page.summary
