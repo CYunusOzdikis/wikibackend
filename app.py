@@ -4,6 +4,7 @@ import wikipediaapi
 import random
 import json
 import os
+import zeyrek
 
 app = Flask(__name__)
 CORS(app)
@@ -14,10 +15,22 @@ wiki_tr = wikipediaapi.Wikipedia(
     user_agent='WikibulyaApp/1.0 (cyunusozdikis@gmail.com)'
 )
 
+# Zeyrek kök bulucu başlat
+analyzer = zeyrek.MorphAnalyzer()
+
+# Kök çıkaran fonksiyon
+def get_root(word):
+    analyses = analyzer.analyze(word)
+    if analyses:
+        lemmas = analyses[0].lemma_root_candidates
+        if lemmas:
+            return lemmas[0][0]
+    return word.lower()
+
 @app.route("/daily", methods=["GET"])
 def get_random_article():
     try:
-        # Türkçe Wikipedia’daki popüler rastgele sayfalardan biri
+        # Türkçe Wikipedia’daki rastgele sayfalardan biri
         random_titles = [
             "Türkiye", "Matematik", "Fizik", "Tarih", "İstanbul",
             "Sanat", "Felsefe", "Biyoloji", "Bilgisayar", "Müzik"
@@ -28,7 +41,7 @@ def get_random_article():
         if not page.exists():
             raise Exception("Makale bulunamadı.")
 
-        print("📄 Seçilen makale:", title)  # ← TERMINALE LOG EKLENDİ
+        print("📄 Seçilen makale:", title)  # Terminal log
 
         data = {
             "title": page.title,
